@@ -24,54 +24,77 @@ immediately contained by the current directory:
     -dir xyz means that the current directory 
     contains a directory named xyz.
 '''
+class Tree:
+    '''Tree structure.'''
+    def __init__(self, node):
+        self.root = node
+        self.directory = node
 
-class Node:
-    '''Represents tree node.'''
-    parent = None
-    children = []
-    size = 0
 
-    def __init__(self, name: str, parent):
+    def set_dir(self, node):
+        self.directory = node
+
+
+    def get_dir(self):
+        return self.directory
+
+
+    def __str__(self):
+        res = self.root.name
+        for child in self.root.children:
+            res += f'\n\t{child}'
+        return res
+
+
+class DirNode:
+    '''Represents directory node.'''
+    def __init__(self, name: str):
         self.name = name.strip()
-        self.parent = parent
+        self.children = []
+        self.size = 0
+
+        if name != '/':
+            self.parent = tree.get_dir()
+
+
+    def add_child(self, node):
+        self.children.append(node)
+
+
+    def get_parent(self):
+        return self.parent
 
 
     def __str__(self) -> str:
-        return f'{self.name} - ({self.size})'
+        return f'dir {self.name} - [{self.size}]'
 
 
-    def add_child(self, child):
-        self.children.append(child)
-
-
-    def set_size(self, size: int) -> None:
+class FileNode:
+    '''Represents file node.'''
+    def __init__(self, name: str, size: int):
+        self.name = name
         self.size = size
 
 
-    def calculate_size(self):
-        if len(self.children) > 0:
-            for child in self.children:
-                self.size += child.size
+    def __str__(self):
+        return f'file {self.name} - [{self.size}]'
 
 
-def parse_line(line: str, parent_node: Node) -> Node:
+def parse_line(line: str):
     if line[:3] == 'dir':
-        return Node(name=line[4:].strip(), parent=parent_node)
+        tree.get_dir().add_child(DirNode(name=line[4:].strip()))
     else:
         size, name = line.split(' ')
-        res_node = Node(name=name, parent=parent_node)
-        res_node.set_size(size=size)
-        return res_node
+        tree.get_dir().add_child(FileNode(name=name.strip(), size=int(size)))
 
 
 # read data from text file
-with open('2022/input-text/day7.txt', encoding='utf-8') as file:    # change txt filepath when debug
+with open('input-text/day7.txt', encoding='utf-8') as file:    # change txt filepath when debug
     data = file.readlines()
 
 # program start
 if __name__ == '__main__':
-    root = Node('/', parent=None)
-    curr: Node = root
+    tree = Tree(DirNode('/'))
 
     for i in range(1, len(data) - 1):
         # change directory
@@ -79,17 +102,20 @@ if __name__ == '__main__':
             target_dir = data[i][5:].strip()
             # go out one level
             if target_dir == '..':
-                curr = curr.parent
+                tree.set_dir(tree.get_dir().get_parent())
             # go in one level
-            else:                                   # TODO: MAKE SURE CD CHANGES CURR NODE TO CHILD OF CURR WITH SAME NAME
-                for child in curr.children:
+            else:
+                for child in tree.get_dir().children:
                     if child.name == target_dir:
-                        curr = child
+                        tree.set_dir(child)
 
         # ls command
         if '$ ls' in data[i]:
             i += 1
             while '$' != data[i][0] and i < len(data) - 1:
-                node: Node = parse_line(line=data[i], parent_node=curr)
-                curr.add_child(node)
+                if data[i][:3] == 'dir':
+                    tree.get_dir().add_child(DirNode(name=data[i][4:].strip()))
+                else:
+                    size, name = data[i].split(' ')
+                    tree.get_dir().add_child(FileNode(name=name.strip(), size=int(size)))
                 i += 1
