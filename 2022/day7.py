@@ -80,22 +80,16 @@ class FileNode:
         return f'file {self.name} - [{self.size}]'
 
 
-def parse_line(line: str):
-    if line[:3] == 'dir':
-        tree.get_dir().add_child(DirNode(name=line[4:].strip()))
-    else:
-        size, name = line.split(' ')
-        tree.get_dir().add_child(FileNode(name=name.strip(), size=int(size)))
-
-
 # read data from text file
 with open('input-text/day7.txt', encoding='utf-8') as file:    # change txt filepath when debug
     data = file.readlines()
+
 
 # program start
 if __name__ == '__main__':
     tree = Tree(DirNode('/'))
 
+    # build tree
     for i in range(1, len(data) - 1):
         # change directory
         if '$ cd' in data[i]:
@@ -119,3 +113,6 @@ if __name__ == '__main__':
                     size, name = data[i].split(' ')
                     tree.get_dir().add_child(FileNode(name=name.strip(), size=int(size)))
                 i += 1
+
+    # traverse tree and calculate directory sizes
+    
