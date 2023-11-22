@@ -26,7 +26,7 @@ immediately contained by the current directory:
 '''
 
 class Node:
-    '''Represents directory folder.'''
+    '''Represents tree node.'''
     parent = None
     children = []
     size = 0
@@ -59,9 +59,9 @@ def parse_line(line: str, parent_node: Node) -> Node:
         return Node(name=line[4:].strip(), parent=parent_node)
     else:
         size, name = line.split(' ')
-        node = Node(name=name, parent=parent_node)
-        node.set_size(size=size)
-        return node
+        res_node = Node(name=name, parent=parent_node)
+        res_node.set_size(size=size)
+        return res_node
 
 
 # read data from text file
@@ -81,11 +81,11 @@ if __name__ == '__main__':
             if target_dir == '..':
                 curr = curr.parent
             # go in one level
-            else:
+            else:                                   # TODO: MAKE SURE CD CHANGES CURR NODE TO CHILD OF CURR WITH SAME NAME
                 for child in curr.children:
                     if child.name == target_dir:
                         curr = child
-        
+
         # ls command
         if '$ ls' in data[i]:
             i += 1
