@@ -1,6 +1,6 @@
 '''Advent of Code Day 1 - https://adventofcode.com/2023/day/1'''
 
-text_to_nums = {
+my_dict = {
     'one': 1,
     'two': 2,
     'three': 3,
@@ -10,6 +10,15 @@ text_to_nums = {
     'seven': 7,
     'eight': 8,
     'nine': 9,
+    '1': 1,
+    '2': 2,
+    '3': 3,
+    '4': 4,
+    '5': 5,
+    '6': 6,
+    '7': 7,
+    '8': 8,
+    '9': 9,
 }
 
 # read data from text file
@@ -25,21 +34,36 @@ def get_num(text: str) -> int:
         if c.isdigit():
             digits.append(c)
 
-    return int(digits[0] + digits[-1])
+    if digits:
+        return int(digits[0] + digits[-1])
+    return 0
 
 
 # part two
 def get_num_with_str(text: str) -> int:
-    digits = []
+    '''Extracts digits from line of text, also checks spelled out numbers.'''
+    numbers = {}
 
-    for c in text:
-        digits.append(c)
+    for key in my_dict.keys():
+        if key in text:
+            numbers[key] = text.index(key)
 
-    return int(digits[0] + digits[-1])
+    for index, c in enumerate(text):
+        if c.isdigit():
+            numbers[c] = index
+
+    sorted_by_value = sorted(numbers.items(), key=lambda x:x[1])
+    first = sorted_by_value[0][0]
+    last = sorted_by_value[-1][0]
+
+    return (my_dict[first] * 10) + my_dict[last]
 
 if __name__ == '__main__':
-    nums = []
+    part_one = 0
+    part_two = 0
     for line in data:
-        nums.append(get_num(line.strip()))
+        part_one += get_num(line.strip())
+        part_two += get_num_with_str(line.strip())
 
-    print(sum(nums))
+    print(part_one)
+    print(part_two) # 53859
