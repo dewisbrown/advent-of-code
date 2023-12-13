@@ -42,21 +42,48 @@ def get_num(text: str) -> int:
 # part two
 def get_num_with_str(text: str) -> int:
     '''Extracts digits from line of text, also checks spelled out numbers.'''
-    numbers = {}
-
-    for key in my_dict.keys():
-        if key in text:
-            numbers[key] = text.index(key)
-
-    for index, c in enumerate(text):
-        if c.isdigit():
-            numbers[c] = index
-
-    sorted_by_value = sorted(numbers.items(), key=lambda x:x[1])
-    first = sorted_by_value[0][0]
-    last = sorted_by_value[-1][0]
+    tokens_with_indices = parse_line(text)
+    #print(tokens_with_indices)
+    first = tokens_with_indices[0][0]
+    last = tokens_with_indices[-1][0]
 
     return (my_dict[first] * 10) + my_dict[last]
+
+
+def parse_line(text: str) -> list:
+    current_lexeme = ''
+    res = []
+    i = 0
+    n = len(text)
+
+    while (i < n):
+        while (i != n and text[i].isdigit()):
+            res.append([text[i], i])
+            current_lexeme = ''
+            i += 1
+        if i == n:
+            break
+        current_lexeme += text[i]
+        if is_token(current_lexeme):
+            token = get_token(current_lexeme)
+            res.append([token, i - len(current_lexeme) + current_lexeme.index(token) + 1])
+            current_lexeme = ''
+        i += 1
+    return res
+
+
+def is_token(text: str) -> bool:
+    for key in my_dict.keys():
+        if key in text:
+            return True
+    return False
+
+
+def get_token(text):
+    for key in my_dict.keys():
+        if key in text:
+            return key
+
 
 if __name__ == '__main__':
     part_one = 0
@@ -66,4 +93,4 @@ if __name__ == '__main__':
         part_two += get_num_with_str(line.strip())
 
     print(part_one)
-    print(part_two) # 53859
+    print(part_two) # wrong answers: 53859, 53900
