@@ -30,6 +30,7 @@ def get_num(text: str) -> int:
     '''Extracts 2 digit number from line of text.'''
     digits = []
 
+    text = convert_text(text)
     for c in text:
         if c.isdigit():
             digits.append(c)
@@ -40,14 +41,34 @@ def get_num(text: str) -> int:
 
 
 # part two
-def get_num_with_str(text: str) -> int:
-    '''Extracts digits from line of text, also checks spelled out numbers.'''
-    tokens_with_indices = parse_line(text)
-    #print(tokens_with_indices)
-    first = tokens_with_indices[0][0]
-    last = tokens_with_indices[-1][0]
 
-    return (my_dict[first] * 10) + my_dict[last]
+tokens = {
+    '1': 1, '2': 2, '3': 3,
+    '4': 4, '5': 5, '6': 6,
+    '7': 7, '8': 8, '9': 9
+}
+
+text_to_num = {
+    'one': '1',
+    'two': '2',
+    'three': '3',
+    'four': '4',
+    'five': '5',
+    'six': '6',
+    'seven': '7',
+    'eight': '8',
+    'nine': '9'
+}
+
+def convert_text(string: str) -> int:
+    k = []
+    for token in text_to_num.keys():
+        if token in string:
+            k.append((token, string.find(token)))
+    k = sorted(k, key=lambda x: x[1])
+    for s in k:
+        string = string.replace(s[0], text_to_num[s[0]])
+    return string
 
 
 def parse_line(text: str) -> list:
@@ -89,8 +110,8 @@ if __name__ == '__main__':
     part_one = 0
     part_two = 0
     for line in data:
-        part_one += get_num(line.strip())
-        part_two += get_num_with_str(line.strip())
+        # part_one += get_num(line.strip())
+        part_two += get_num(line.strip())
 
-    print(part_one)
-    print(part_two) # wrong answers: 53859, 53900
+    # print(part_one)
+    print(part_two) # wrong answers: 53859, 53900, 53889
